@@ -17,7 +17,7 @@
             <section class="panel"><div class="panel-heading"><h2>01 / Akses akun</h2><span id="auth-status" class="badge">Belum terhubung</span></div>
                 <form id="login-form"><label for="email">Email</label><input id="email" type="email" autocomplete="username" placeholder="nama@its.ac.id" required>
                 <label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required>
-                <button id="login-button" type="submit">Masuk & buat token <span>↗</span></button></form>
+                <button id="login-button" type="submit">Masuk & buat token <span>↗</span></button><button type="button" id="demo-login-button" class="secondary" style="margin-top: 8px; width: 100%;" onclick="document.getElementById('email').value='mahasiswa@its.ac.id'; document.getElementById('password').value='password';">Isi Akun Demo</button></form>
                 <button id="logout-button" class="secondary" hidden>Keluar & cabut token</button>
                 <p class="hint">Token berlaku 24 jam dan hanya disimpan dalam memori halaman. Muat ulang untuk login kembali.</p>
                 <p id="login-message" role="status" class="feedback"></p>
