@@ -1,4 +1,4 @@
-<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 dark:bg-slate-950/90 dark:border-slate-800 transition-colors duration-200">
+<header class="top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 dark:bg-slate-950/90 dark:border-slate-800 transition-colors duration-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
 
         <!-- Navigation Links -->
