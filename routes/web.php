@@ -4,6 +4,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 
+Route::view('/chat', 'chat')->name('chat');
+
 Route::get('/', function () {
     return view('dashboard'); // The view logged-in users should see
 })->middleware('auth');

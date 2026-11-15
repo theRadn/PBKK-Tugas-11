@@ -4,6 +4,7 @@
         <!-- Navigation Links -->
         <nav class="mx-auto">
             <ul class="flex items-center space-x-8 text-sm font-semibold">
+                <li><a href="{{ route('chat') }}">AI Chat Hub</a></li>
             </ul>
         </nav>
 
