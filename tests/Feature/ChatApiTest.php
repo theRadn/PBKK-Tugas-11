@@ -255,3 +255,67 @@ test('history returns ten items per page', function () {
     $this->getJson('/api/chat-ai/history', $headers)->assertJsonCount(10, 'data')->assertJsonPath('meta.last_page', 2);
     $this->getJson('/api/chat-ai/history?page=2', $headers)->assertJsonCount(2, 'data')->assertJsonPath('meta.current_page', 2);
 });
+
+test('chat continues existing session and sends history to upstream provider', function () {
+    $user = User::factory()->create();
+    $sessionId = fake()->uuid();
+    $user->chatLogs()->create([
+        'session_id' => $sessionId,
+        'prompt' => 'Ide 1?',
+        'jawaban_ai' => 'Sistem Peminjaman Lab',
+        'model_used' => 'llama-test',
+        'provider' => 'ollama',
+    ]);
+
+    Http::fake(['ollama.test/*' => Http::response(ollamaFrames())]);
+
+    $response = $this->postJson('/api/chat-ai', [
+        'prompt' => 'Bagaimana arsitekturnya?',
+        'session_id' => $sessionId,
+    ], chatHeaders($user))->assertOk();
+
+    expect($response->json('session_id'))->toBe($sessionId);
+
+    Http::assertSent(function (Request $request) {
+        $messages = $request['messages'];
+
+        return count($messages) === 4
+            && $messages[0]['role'] === 'system'
+            && $messages[1] === ['role' => 'user', 'content' => 'Ide 1?']
+            && $messages[2] === ['role' => 'assistant', 'content' => 'Sistem Peminjaman Lab']
+            && $messages[3] === ['role' => 'user', 'content' => 'Bagaimana arsitekturnya?'];
+    });
+
+    expect($user->chatLogs()->where('session_id', $sessionId)->count())->toBe(2);
+});
+
+test('sessions endpoint lists grouped sessions and allows retrieving and deleting', function () {
+    $user = User::factory()->create();
+    $sessionId = fake()->uuid();
+    $user->chatLogs()->create([
+        'session_id' => $sessionId,
+        'prompt' => 'Pesan 1',
+        'jawaban_ai' => 'Jawaban 1',
+        'model_used' => 'test',
+        'provider' => 'ollama',
+    ]);
+    $user->chatLogs()->create([
+        'session_id' => $sessionId,
+        'prompt' => 'Pesan 2',
+        'jawaban_ai' => 'Jawaban 2',
+        'model_used' => 'test',
+        'provider' => 'ollama',
+    ]);
+
+    $headers = chatHeaders($user);
+
+    $list = $this->getJson('/api/chat-ai/sessions', $headers)->assertOk();
+    expect($list->json('data.0.session_id'))->toBe($sessionId);
+    expect($list->json('data.0.total_messages'))->toBe(2);
+
+    $detail = $this->getJson("/api/chat-ai/sessions/{$sessionId}", $headers)->assertOk();
+    expect($detail->json('data.messages'))->toHaveCount(2);
+
+    $this->deleteJson("/api/chat-ai/sessions/{$sessionId}", [], $headers)->assertOk();
+    expect($user->chatLogs()->where('session_id', $sessionId)->count())->toBe(0);
+});

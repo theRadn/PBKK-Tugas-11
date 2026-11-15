@@ -14,14 +14,15 @@ class LlmService
      * Both modes consume the real upstream stream. Never simulate streaming by
      * splitting a completed answer. Fall back only before any answer is emitted.
      *
+     * @param array<int, array{role: string, content: string}> $history
      * @return Generator<int, array<string, mixed>>
      */
-    public function stream(string $prompt, ?string $provider = null): Generator
+    public function stream(string $prompt, ?string $provider = null, array $history = []): Generator
     {
         $provider ??= (string) config('llm.provider');
         $emitted = false;
         try {
-            foreach ($this->readProvider($provider, $prompt) as $event) {
+            foreach ($this->readProvider($provider, $prompt, $history) as $event) {
                 if ($event['type'] === 'delta' && $event['text'] !== '') {
                     $emitted = true;
                 }
@@ -35,14 +36,17 @@ class LlmService
             // Do not log prompts, credentials, URLs, or upstream error bodies.
             Log::warning('Ollama unavailable; switching to Senopati.', ['exception_type' => $exception::class]);
             yield ['type' => 'fallback', 'provider' => 'senopati', 'fallback_used' => true];
-            foreach ($this->readProvider('senopati', $prompt) as $event) {
+            foreach ($this->readProvider('senopati', $prompt, $history) as $event) {
                 yield $event + ['fallback_used' => true];
             }
         }
     }
 
-    /** @return Generator<int, array<string, mixed>> */
-    private function readProvider(string $provider, string $prompt): Generator
+    /**
+     * @param array<int, array{role: string, content: string}> $history
+     * @return Generator<int, array<string, mixed>>
+     */
+    private function readProvider(string $provider, string $prompt, array $history = []): Generator
     {
         if (! in_array($provider, ['ollama', 'senopati'], true)) {
             throw new RuntimeException('Unsupported provider.');
@@ -65,12 +69,22 @@ class LlmService
             $client = $client->withToken((string) config('llm.senopati.key'));
         }
 
+        $messages = [
+            ['role' => 'system', 'content' => (string) config('llm.system_prompt')],
+        ];
+        foreach ($history as $item) {
+            if (isset($item['role'], $item['content']) && in_array($item['role'], ['user', 'assistant'], true)) {
+                $messages[] = [
+                    'role' => $item['role'],
+                    'content' => (string) $item['content'],
+                ];
+            }
+        }
+        $messages[] = ['role' => 'user', 'content' => $prompt];
+
         $payload = [
             'model' => $model,
-            'messages' => [
-                ['role' => 'system', 'content' => (string) config('llm.system_prompt')],
-                ['role' => 'user', 'content' => $prompt],
-            ],
+            'messages' => $messages,
             'stream' => true,
         ];
         if (! $ollama) {

@@ -11,6 +11,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/logout', [TokenController::class, 'destroy']);
     Route::post('/chat-ai', [ChatController::class, 'store'])->middleware('throttle:20,1');
     Route::get('/chat-ai/history', [ChatController::class, 'index'])->middleware('throttle:60,1');
+    Route::get('/chat-ai/sessions', [ChatController::class, 'sessions'])->middleware('throttle:60,1');
+    Route::get('/chat-ai/sessions/{sessionId}', [ChatController::class, 'showSession'])->middleware('throttle:60,1');
+    Route::delete('/chat-ai/sessions/{sessionId}', [ChatController::class, 'destroySession'])->middleware('throttle:60,1');
 });
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {

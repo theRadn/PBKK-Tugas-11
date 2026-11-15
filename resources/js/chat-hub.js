@@ -9,6 +9,7 @@ import '../css/chat-markdown.css';
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let token = null;
     let busy = false;
+    let currentSessionId = null;
     let historyPage = 1;
     let historyLastPage = 1;
     const emptyState = $('empty-state').cloneNode(true);
@@ -28,16 +29,24 @@ import '../css/chat-markdown.css';
         $('stream').disabled = busy;
         $('previous-page').disabled = !token || busy;
         $('next-page').disabled = !token || busy;
+        if ($('new-session-button')) $('new-session-button').disabled = !token || busy;
+    }
+    function startNewSession() {
+        currentSessionId = null;
+        $('messages').replaceChildren(emptyState.cloneNode(true));
+        $('metadata').hidden = true;
+        if ($('active-session-badge')) $('active-session-badge').style.display = 'none';
+        if ($('new-session-button')) $('new-session-button').hidden = true;
+        $('chat-status').textContent = 'Siap menerima ide';
+        feedback('chat-message', 'Sesi baru dimulai. Kirim pertanyaanmu.');
     }
     function clearAccount() {
         token = null;
-        $('messages').replaceChildren(emptyState.cloneNode(true));
-        $('metadata').hidden = true;
-        $('history-list').textContent = 'Login untuk melihat riwayat akunmu.';
+        startNewSession();
+        $('history-list').textContent = 'Login untuk melihat riwayat sesi akunmu.';
         $('previous-page').hidden = true;
         $('next-page').hidden = true;
         $('page-label').textContent = '';
-        $('chat-status').textContent = 'Siap menerima ide';
         feedback('chat-message', 'Login untuk mulai berdiskusi.');
         syncAccess();
     }
@@ -68,6 +77,7 @@ import '../css/chat-markdown.css';
             $('password').value = '';
             feedback('login-message', 'Akun terhubung. Token aktif selama 24 jam.');
             feedback('chat-message', 'Siap. Kirim pertanyaan pertama kamu.');
+            loadHistory(1);
         } catch (error) { feedback('login-message', error.message, true); }
         finally { busy = false; syncAccess(); }
     });
@@ -80,6 +90,12 @@ import '../css/chat-markdown.css';
         } catch (error) { feedback('login-message', error.message, true); }
         finally { busy = false; syncAccess(); }
     });
+    if ($('new-session-button')) {
+        $('new-session-button').addEventListener('click', () => {
+            if (busy) return;
+            startNewSession();
+        });
+    }
     $('messages').addEventListener('click', event => {
         const button = event.target.closest('[data-prompt]');
         if (!button) return;
@@ -106,13 +122,20 @@ import '../css/chat-markdown.css';
         const panel = $('messages');
         const following = panel.scrollHeight - panel.scrollTop - panel.clientHeight < 100;
         paint();
-        // Let readers scroll back through the answer without pulling them down.
         if (following) panel.scrollTop = panel.scrollHeight;
     }
     function showMetadata(payload) {
         const d = payload.data;
         $('metadata').hidden = false;
-        $('metadata').textContent = `${d.provider} · ${payload.model_used} · ${d.token_consumed ?? 'tidak dilaporkan'} token · fallback: ${d.fallback_used ? 'ya' : 'tidak'} · ${payload.session_id} · ${payload.timestamp}`;
+        $('metadata').textContent = `${d.provider} · ${payload.model_used} · ${d.token_consumed ?? 'tidak dilaporkan'} token · fallback: ${d.fallback_used ? 'ya' : 'tidak'} · sesi: ${payload.session_id} · ${payload.timestamp}`;
+    }
+    function updateSessionBadge(sessionId) {
+        currentSessionId = sessionId;
+        if ($('active-session-badge')) {
+            $('active-session-badge').style.display = 'inline-block';
+            $('active-session-badge').textContent = `Sesi: ${sessionId.slice(0, 8)}…`;
+        }
+        if ($('new-session-button')) $('new-session-button').hidden = false;
     }
     async function readEvents(response, onEvent) {
         if (!response.body) throw new Error('Browser tidak mendukung response streaming.');
@@ -138,11 +161,22 @@ import '../css/chat-markdown.css';
             }
         } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
     }
+    $('prompt').addEventListener('keydown', event => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            $('chat-form').requestSubmit();
+        }
+    });
     $('chat-form').addEventListener('submit', async event => {
         event.preventDefault();
         if (!token || busy) return;
         const prompt = $('prompt').value.trim();
         if (!prompt) return;
+
+        // Kosongkan textarea seketika saat tombol kirim ditekan
+        $('prompt').value = '';
+        $('prompt').dispatchEvent(new Event('input'));
+
         busy = true; syncAccess();
         $('metadata').hidden = true;
         message('user', prompt);
@@ -165,6 +199,7 @@ import '../css/chat-markdown.css';
         let completed = false;
         try {
             const body = { prompt, stream: streaming };
+            if (currentSessionId) body.session_id = currentSessionId;
             if ($('provider').value) body.provider = $('provider').value;
             const response = await request('/chat-ai', { method: 'POST', body: JSON.stringify(body),
                 headers: { Accept: streaming ? 'text/event-stream' : 'application/json' } });
@@ -183,48 +218,140 @@ import '../css/chat-markdown.css';
                     if (name === 'error') throw new Error(payload.message);
                 });
                 if (!finalPayload) throw new Error('Stream terputus sebelum selesai. Jawaban belum tersimpan.');
-                // Keep draining the word queue after the provider completes.
                 await writer.finished;
-                showMetadata(finalPayload); completed = true;
+                showMetadata(finalPayload);
+                updateSessionBadge(finalPayload.session_id);
+                completed = true;
             } else {
                 const payload = await response.json();
                 followAnswer(() => renderMarkdown(answer, payload.data.jawaban_ai));
-                showMetadata(payload); completed = true;
+                showMetadata(payload);
+                updateSessionBadge(payload.session_id);
+                completed = true;
             }
             feedback('chat-message', 'Jawaban selesai dan riwayat tersimpan.');
-            $('prompt').value = ''; $('prompt').dispatchEvent(new Event('input'));
+            loadHistory(historyPage);
         } catch (error) {
             writer?.stop();
             if (!answer.textContent) answer.textContent = 'Belum ada jawaban dari AI.';
             feedback('chat-message', error.message, true);
+            if (!$('prompt').value) {
+                $('prompt').value = prompt;
+                $('prompt').dispatchEvent(new Event('input'));
+            }
         } finally {
             busy = false; syncAccess();
             $('chat-status').textContent = completed ? 'Selesai & tersimpan' : 'Request gagal';
         }
     });
+
+    async function openSession(sessionId) {
+        if (busy) return;
+        busy = true; syncAccess();
+        feedback('chat-message', 'Memuat percakapan sesi…');
+        try {
+            const payload = await (await request(`/chat-ai/sessions/${sessionId}`)).json();
+            const msgs = payload.data.messages;
+            $('messages').replaceChildren();
+            for (const item of msgs) {
+                message('user', item.data.prompt);
+                const ans = message('assistant', '');
+                renderMarkdown(ans, item.data.jawaban_ai);
+            }
+            $('messages').scrollTop = $('messages').scrollHeight;
+            updateSessionBadge(sessionId);
+            const last = msgs[msgs.length - 1];
+            if (last) showMetadata(last);
+            feedback('chat-message', `Sesi dimuat (${msgs.length} pesan). Kamu bisa melanjutkan percakapan.`);
+        } catch (error) {
+            feedback('chat-message', error.message, true);
+        } finally {
+            busy = false; syncAccess();
+        }
+    }
+
+    async function deleteSession(sessionId, event) {
+        event?.stopPropagation();
+        if (!confirm('Hapus sesi percakapan ini beserta seluruh pesannya?')) return;
+        busy = true; syncAccess();
+        feedback('chat-message', 'Menghapus sesi…');
+        try {
+            await request(`/chat-ai/sessions/${sessionId}`, { method: 'DELETE' });
+            if (currentSessionId === sessionId) startNewSession();
+            feedback('chat-message', 'Sesi berhasil dihapus.');
+            await loadHistory(historyPage);
+        } catch (error) {
+            feedback('chat-message', error.message, true);
+        } finally {
+            busy = false; syncAccess();
+        }
+    }
+
     async function loadHistory(page = 1) {
+        if (!token) return;
         busy = true; syncAccess();
         try {
-            const payload = await (await request(`/chat-ai/history?page=${page}`)).json();
-            historyPage = payload.meta.current_page; historyLastPage = payload.meta.last_page;
+            const payload = await (await request(`/chat-ai/sessions?page=${page}`)).json();
+            historyPage = payload.meta.current_page;
+            historyLastPage = payload.meta.last_page || 1;
             $('history-list').replaceChildren();
-            if (!payload.data.length) $('history-list').textContent = 'Belum ada percakapan yang tersimpan.';
+            if (!payload.data.length) {
+                $('history-list').textContent = 'Belum ada riwayat percakapan yang tersimpan.';
+            }
             for (const row of payload.data) {
-                const item = document.createElement('details');
-                const title = document.createElement('summary'); title.textContent = row.data.prompt;
-                const content = document.createElement('div'); content.className = 'markdown-body';
-                renderMarkdown(content, row.data.jawaban_ai);
-                const meta = document.createElement('p'); meta.className = 'meta';
-                meta.textContent = `${row.model_used} · ${row.data.token_consumed ?? 'tidak dilaporkan'} token · ${row.data.provider} · fallback: ${row.data.fallback_used} · ${row.session_id} · ${row.timestamp}`;
-                item.append(title, content, meta); $('history-list').append(item);
+                const item = document.createElement('div');
+                item.className = 'session-card';
+                item.style.cssText = 'border-top: 1px solid var(--line); padding: 12px 0; display: flex; justify-content: space-between; align-items: center; gap: 12px;';
+
+                const info = document.createElement('div');
+                info.style.cssText = 'flex: 1; min-width: 0; cursor: pointer;';
+                info.addEventListener('click', () => openSession(row.session_id));
+
+                const title = document.createElement('div');
+                title.style.cssText = 'font-weight: 600; font-size: 13px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
+                title.textContent = row.title || 'Percakapan tanpa judul';
+                title.title = row.title;
+
+                const meta = document.createElement('div');
+                meta.className = 'meta';
+                meta.style.cssText = 'font-size: 11px; color: var(--muted); margin-top: 3px;';
+                meta.textContent = `${row.total_messages} pesan · ${row.model_used} · sesi: ${row.session_id.slice(0, 8)}…`;
+
+                info.append(title, meta);
+
+                const actions = document.createElement('div');
+                actions.style.cssText = 'display: flex; align-items: center; gap: 6px; flex-shrink: 0;';
+
+                const openBtn = document.createElement('button');
+                openBtn.type = 'button';
+                openBtn.className = 'secondary';
+                openBtn.style.cssText = 'padding: 5px 11px; font-size: 11px;';
+                openBtn.textContent = 'Buka ↗';
+                openBtn.addEventListener('click', () => openSession(row.session_id));
+
+                const delBtn = document.createElement('button');
+                delBtn.type = 'button';
+                delBtn.className = 'secondary';
+                delBtn.style.cssText = 'padding: 5px 9px; font-size: 11px; color: #b53636; border-color: #ecc;';
+                delBtn.textContent = '✕';
+                delBtn.title = 'Hapus sesi';
+                delBtn.addEventListener('click', e => deleteSession(row.session_id, e));
+
+                actions.append(openBtn, delBtn);
+                item.append(info, actions);
+                $('history-list').append(item);
             }
             $('page-label').textContent = `${historyPage} / ${historyLastPage}`;
             $('previous-page').hidden = historyPage <= 1;
             $('next-page').hidden = historyPage >= historyLastPage;
-        } catch (error) { feedback('chat-message', error.message, true); }
-        finally { busy = false; syncAccess(); }
+        } catch (error) {
+            feedback('chat-message', error.message, true);
+        } finally {
+            busy = false; syncAccess();
+        }
     }
-    $('history-button').addEventListener('click', () => loadHistory());
+
+    $('history-button').addEventListener('click', () => loadHistory(1));
     $('previous-page').addEventListener('click', () => loadHistory(historyPage - 1));
     $('next-page').addEventListener('click', () => loadHistory(historyPage + 1));
 })();

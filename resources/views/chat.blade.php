@@ -28,14 +28,38 @@
                 <div class="theme-note"><span class="eyebrow">TEMA ASISTEN</span><p>Ide proyek & rekayasa perangkat lunak PBKK</p></div>
             </section>
         </aside>
-        <section class="panel conversation"><div class="panel-heading"><h2>Ruang diskusi</h2><span class="live"><i></i> <span id="chat-status">Siap menerima ide</span></span></div>
+        <section class="panel conversation">
+            <div class="panel-heading">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <h2>Ruang diskusi</h2>
+                    <span id="active-session-badge" class="badge" style="display: none; background: #e3efe7; color: var(--green);">Sesi Aktif</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button type="button" id="new-session-button" class="secondary" style="padding: 6px 12px; font-size: 11px;" hidden>+ Sesi Baru</button>
+                    <span class="live"><i></i> <span id="chat-status">Siap menerima ide</span></span>
+                </div>
+            </div>
             <div id="messages" class="messages" aria-label="Percakapan"><div id="empty-state" class="empty-state"><span class="spark">✳</span><h3>Apa yang ingin kamu bangun?</h3><p>Pilih pemantik ide atau tulis pertanyaanmu sendiri.</p><div class="suggestions"><button type="button" data-prompt="Berikan ide proyek PBKK untuk membantu kegiatan mahasiswa ITS.">Cari ide proyek ↗</button><button type="button" data-prompt="Jelaskan arsitektur Laravel untuk aplikasi peminjaman ruang kampus.">Rancang arsitektur ↗</button><button type="button" data-prompt="Bagaimana mengamankan API Laravel menggunakan Sanctum?">Diskusi keamanan ↗</button></div></div></div>
             <div id="metadata" class="metadata" hidden></div>
             <form id="chat-form"><label for="prompt">Pertanyaanmu</label><textarea id="prompt" rows="3" maxlength="1000" placeholder="Misalnya: bantu rancang aplikasi mentoring mahasiswa…" required></textarea><div class="composer-footer"><span id="counter" class="hint">0 / 1000 karakter</span><button id="send-button" disabled>Kirim prompt <span>↑</span></button></div></form>
             <p id="chat-message" role="status" class="feedback">Login untuk mulai berdiskusi.</p>
         </section>
     </div>
-    <section class="panel history"><div class="panel-heading"><div><p class="eyebrow">TERSIMPAN UNTUK AKUNMU</p><h2>Riwayat percakapan</h2></div><button id="history-button" class="secondary" disabled>Muat riwayat ↻</button></div><div id="history-list" class="hint">Jawaban yang selesai akan tersimpan bersama model dan pemakaian token.</div><div class="pagination"><button id="previous-page" class="secondary" hidden>← Sebelumnya</button><span id="page-label"></span><button id="next-page" class="secondary" hidden>Berikutnya →</button></div></section>
+    <section class="panel history">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">TERSIMPAN UNTUK AKUNMU</p>
+                <h2>Riwayat percakapan per sesi</h2>
+            </div>
+            <button id="history-button" class="secondary" disabled>Muat riwayat sesi ↻</button>
+        </div>
+        <div id="history-list" class="hint">Percakapan tersimpan per sesi dan dapat dimuat ulang kembali ke ruang diskusi.</div>
+        <div class="pagination">
+            <button id="previous-page" class="secondary" hidden>← Sebelumnya</button>
+            <span id="page-label"></span>
+            <button id="next-page" class="secondary" hidden>Berikutnya →</button>
+        </div>
+    </section>
     <footer><span>Secure LLM Chat API Hub</span><span>Sanctum auth · System prompt · Live streaming</span></footer>
 </main>
 </body>

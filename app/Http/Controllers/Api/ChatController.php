@@ -24,8 +24,23 @@ class ChatController extends Controller
         // provider requests retain their own bounded network timeouts.
         $executionSeconds = max(30, 2 * ((int) config('llm.timeout') + (int) config('llm.connect_timeout')) + 15);
         set_time_limit($executionSeconds);
-        $sessionId = (string) Str::uuid();
-        $events = $llm->stream($input['prompt'], $input['provider'] ?? null);
+        $sessionId = ! empty($input['session_id']) ? (string) $input['session_id'] : (string) Str::uuid();
+
+        // Build history context if continuing an existing session
+        $history = [];
+        if (! empty($input['session_id'])) {
+            $pastLogs = $request->user()->chatLogs()
+                ->where('session_id', $sessionId)
+                ->orderBy('id', 'asc')
+                ->get();
+
+            foreach ($pastLogs as $pastLog) {
+                $history[] = ['role' => 'user', 'content' => $pastLog->prompt];
+                $history[] = ['role' => 'assistant', 'content' => $pastLog->jawaban_ai];
+            }
+        }
+
+        $events = $llm->stream($input['prompt'], $input['provider'] ?? null, $history);
 
         if (! $request->boolean('stream')) {
             try {
@@ -85,6 +100,60 @@ class ChatController extends Controller
             'data' => $logs->getCollection()->map(fn (ChatLog $log) => (new ChatResource($log))->resolve($request)),
             'meta' => ['current_page' => $logs->currentPage(), 'last_page' => $logs->lastPage()],
         ]);
+    }
+
+    public function sessions(Request $request): JsonResponse
+    {
+        abort_unless($request->user()->tokenCan('chat'), 403);
+
+        $sessions = $request->user()->chatLogs()
+            ->selectRaw('session_id, (SELECT cl2.prompt FROM chat_logs cl2 WHERE cl2.session_id = chat_logs.session_id ORDER BY cl2.id ASC LIMIT 1) as title, COUNT(*) as total_messages, MAX(model_used) as model_used, MAX(created_at) as last_activity')
+            ->groupBy('session_id')
+            ->orderByDesc('last_activity')
+            ->paginate(10);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $sessions->getCollection()->map(fn ($s) => [
+                'session_id' => $s->session_id,
+                'title' => Str::limit($s->title, 60),
+                'total_messages' => (int) $s->total_messages,
+                'model_used' => $s->model_used,
+                'last_activity' => $s->last_activity,
+            ]),
+            'meta' => ['current_page' => $sessions->currentPage(), 'last_page' => $sessions->lastPage()],
+        ]);
+    }
+
+    public function showSession(Request $request, string $sessionId): JsonResponse
+    {
+        abort_unless($request->user()->tokenCan('chat'), 403);
+
+        $logs = $request->user()->chatLogs()
+            ->where('session_id', $sessionId)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        abort_if($logs->isEmpty(), 404);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'session_id' => $sessionId,
+                'messages' => $logs->map(fn (ChatLog $log) => (new ChatResource($log))->resolve($request)),
+            ],
+        ]);
+    }
+
+    public function destroySession(Request $request, string $sessionId): JsonResponse
+    {
+        abort_unless($request->user()->tokenCan('chat'), 403);
+
+        $request->user()->chatLogs()
+            ->where('session_id', $sessionId)
+            ->delete();
+
+        return response()->json(['status' => 'success', 'data' => null]);
     }
 
     /** @param array<string, mixed> $event */

@@ -19,6 +19,7 @@ class ChatRequest extends FormRequest
             'prompt' => ['required', 'string', 'max:1000'],
             'stream' => ['sometimes', 'boolean'],
             'provider' => ['sometimes', Rule::in(['ollama', 'senopati'])],
+            'session_id' => ['sometimes', 'nullable', 'uuid'],
         ];
     }
 }
