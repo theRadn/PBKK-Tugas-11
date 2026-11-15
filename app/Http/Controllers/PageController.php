@@ -15,17 +15,6 @@ class PageController extends Controller
         return view('home', compact('welcomeUser'));
     }
 
-    public function agent()
-    {
-        return view('fp_idea');
-    }
-
-    public function mahasiswaDetail()
-    {
-        $nrp = '5025241104';
-        return view('mahasiswa', compact('nrp'));
-    }
-
     public function store(Request $request)
     {
         if (!Auth::check()) {
