@@ -9,7 +9,7 @@
     @vite('resources/js/chat-hub.js')
 </head>
 <body data-api="{{ url('/api') }}">
-<header><a class="brand" href="{{ route('chat') }}"><span class="brand-icon">✳</span> Chat Hub <span class="badge">PBKK / ITS</span></a><a href="{{ route('dashboard') }}">Dashboard ↗</a></header>
+<header><a class="brand" href="{{ route('chat') }}"><span class="brand-icon">✳</span> Chat Hub <span class="badge">PBKK / ITS</span></a></header>
 <main>
     <section class="intro"><p class="eyebrow">SECURE LLM WORKSPACE</p><h1>Dari pertanyaan,<br>jadi ide yang bisa dibangun.</h1><p>Teman diskusi proyek PBKK. Mulai dari ide aplikasi, arsitektur Laravel, sampai keamanan API.</p></section>
     <div class="workspace">

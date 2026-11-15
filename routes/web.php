@@ -6,26 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/chat', 'chat')->name('chat');
 
-Route::get('/', function () {
-    return view('chat');
-});
-
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware('auth')
-    ->name('dashboard');
-
-Route::post('/agent/idea', [PageController::class, 'store'])
-    ->middleware('auth')
-    ->name('agent.idea.store');
-
-// Edit + delete project (Admin only — enforced in controller + hidden in view)
-Route::put('/projects/{project}', [DashboardController::class, 'update'])
-    ->middleware('auth')
-    ->name('projects.update');
-
-Route::delete('/projects/{project}', [DashboardController::class, 'destroy'])
-    ->middleware('auth')
-    ->name('projects.destroy');
+Route::redirect('/', '/chat');
 
 Route::get('/login', fn () => view('auth.login'))
     ->middleware('guest')
