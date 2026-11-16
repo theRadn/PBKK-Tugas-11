@@ -23,9 +23,8 @@ Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, 
 
 | Bukti | Tangkapan Layar |
 | :--- | :--- |
-| **Respons API Chat JSON (HTTP 200)** | ![01 - Chat API 200](docs/screenshots/01-chat-api-200.png) |
-| **Metadata Model & Token Consumption** | ![02 - Metadata Model dan Token](docs/screenshots/02-metadata-token.png) |
-| **Respons AI Nyata pada Antarmuka Web** | ![03 - Chat Web AI Nyata](docs/screenshots/03-chat-web-ai.png) |
+| **Respons di Interface dan API Chat JSON (HTTP 200)** | ![01 - Chat API 200](<img width="1854" height="1007" alt="image" src="https://github.com/user-attachments/assets/fc62a51b-ba05-4d37-884a-b05773eea913" />) |
+| **Metadata Model & Token Consumption** | ![02 - Metadata Model dan Token](<img width="591" height="268" alt="image" src="https://github.com/user-attachments/assets/66c08874-6e2b-447f-bdb0-d223da0e5612" />) |
 
 ---
 
@@ -34,10 +33,9 @@ Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, 
 
 | Bukti | Tangkapan Layar |
 | :--- | :--- |
-| **Rute API Terproteksi `auth:sanctum` (`route:list`)** | ![04 - Route List Sanctum](docs/screenshots/04-route-sanctum.png) |
-| **Endpoint Login & Penerbitan Bearer Token** | ![05 - Login Token](docs/screenshots/05-login-token.png) |
-| **Penolakan Akses Tanpa Token (HTTP 401)** | ![06 - Error 401 Tanpa Token](docs/screenshots/06-unauthorized-401.png) |
-| **Penolakan Input Tidak Valid (HTTP 422 - Kosong / >1000 Karakter)** | ![07 - Validasi FormRequest 422](docs/screenshots/07-validasi-422.png) |
+| **Rute API Terproteksi `auth:sanctum` (`route:list`)** | ![03 - Route List Sanctum](<img width="717" height="239" alt="image" src="https://github.com/user-attachments/assets/2c8b3af8-acd5-46f0-8ade-5da8a183a6f1" />) |
+| **Endpoint Login & Penerbitan Bearer Token** | ![04 - Login Token](<img width="717" height="290" alt="image" src="https://github.com/user-attachments/assets/2ed79734-aca6-4e48-b352-cd94c6d353ce" />) |
+| **Penolakan Akses Tanpa Token (HTTP 405)** | ![05 - Error 405 Tanpa Token](<img width="717" height="290" alt="image" src="https://github.com/user-attachments/assets/2c2a9515-1cee-4bae-964c-a192bbf83060" />) |
 
 ---
 
@@ -46,10 +44,9 @@ Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, 
 
 | Bukti | Tangkapan Layar |
 | :--- | :--- |
-| **Skema Migrasi Tabel `chat_logs`** | ![08 - Skema Database](docs/screenshots/08-skema-database.png) |
-| **Pencatatan Baris Database (`user_id`, `prompt`, `jawaban_ai`, `model`, `token`)** | ![09 - Log Database](docs/screenshots/09-log-database.png) |
-| **Kesesuaian `session_id` Respons API dengan Baris Database** | ![10 - Pencocokan Session ID](docs/screenshots/10-session-match.png) |
-| **Relasi Eloquent `User -> chatLogs` dan `ChatLog -> user`** | ![11 - Relasi Eloquent](docs/screenshots/11-relasi-user.png) |
+| **Skema Migrasi Tabel `chat_logs`** | ![06 - Skema Database](<img width="717" height="290" alt="image" src="https://github.com/user-attachments/assets/fd93460b-7a6d-4fba-964b-c22e8e363801" />) |
+| **Pencatatan Baris Database (`user_id`, `prompt`, `jawaban_ai`, `model`, `token`)** | ![07 - Log Database](<img width="717" height="290" alt="image" src="https://github.com/user-attachments/assets/a53642b0-6164-4e01-a3ef-576620877158" />) |
+| **Relasi Eloquent `User -> chatLogs` dan `ChatLog -> user`** | ![08 - Relasi Eloquent](<img width="717" height="290" alt="image" src="https://github.com/user-attachments/assets/7e2c17b5-5a1d-48bf-aaa4-51c734b7b05c" />) |
 
 ---
 
@@ -58,20 +55,18 @@ Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, 
 
 | Bukti | Tangkapan Layar |
 | :--- | :--- |
-| **[Challenge 1] Streaming SSE (`text/event-stream`, event `delta` & `done`)** | ![12 - SSE Streaming](docs/screenshots/12-sse-streaming.png) |
-| **[Challenge 2] System Prompt Injection (Tema Asisten Ide Proyek PBKK)** | ![13 - System Prompt Injection](docs/screenshots/13-system-prompt.png) |
-| **[Challenge 3] Auto-fallback Otomatis Ollama ke Senopati ITS (`fallback_used: true`)** | ![14 - Auto Fallback](docs/screenshots/14-auto-fallback.png) |
+| **[Challenge 1] Streaming SSE (`text/event-stream`, event `delta` & `done`)** | ![09 - SSE Streaming](<img width="894" height="692" alt="image" src="https://github.com/user-attachments/assets/00e2f736-6ac4-42fc-a1a2-0eb2de04c745" />) |
+| **[Challenge 2] System Prompt Injection (Tema Asisten Ide Proyek PBKK)** | ![10 - System Prompt Injection](<img width="894" height="692" alt="image" src="https://github.com/user-attachments/assets/2401993f-17fd-4061-896e-99564ad31ba9" />) |
+| **[Challenge 3] Auto-fallback Otomatis Ollama ke Senopati ITS (`fallback_used: true`)** | ![11 - Auto Fallback](<img width="1292" height="833" alt="image" src="https://github.com/user-attachments/assets/d749909c-a3ea-41a9-ab76-eae0a46bd3f7" />) |
 
 ---
 
 ### 5. Antarmuka Web & Kerapian Kode (Bobot 10%)
-*Bukti implementasi frontend interaktif, perenderan Markdown, multi-turn sesi, dan hasil test suite.*
+*Bukti implementasi frontend interaktif (yang sudah tampil di atas), perenderan Markdown, multi-turn sesi, dan hasil test suite.*
 
 | Bukti | Tangkapan Layar |
 | :--- | :--- |
-| **Halaman Chat Interaktif (`/chat`) dengan Perenderan Markdown** | ![15 - Halaman Web Chat](docs/screenshots/15-frontend-chat.png) |
-| **Manajemen Riwayat Percakapan per Sesi & Tombol Muat Ulang** | ![16 - Riwayat per Sesi](docs/screenshots/16-history-session.png) |
-| **Hasil Eksekusi Automated Tests (`php artisan test`)** | ![17 - Unit dan Feature Test](docs/screenshots/17-tests-passed.png) |
+| **Manajemen Riwayat Percakapan per Sesi & Tombol Muat Ulang** | ![12 - Riwayat per Sesi](<img width="1308" height="739" alt="image" src="https://github.com/user-attachments/assets/cab9d5fd-3691-4821-9d37-91bd9acfe3eb" />) |
 
 ---
 
@@ -140,7 +135,7 @@ Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, 
    # Konfigurasi Senopati AI ITS
    SENOPATI_CHAT_URL=https://senopati.its.ac.id/llm-gateway/v1/chat/completions
    SENOPATI_MODEL=qwen3:14b
-   SENOPATI_API_KEY=masukkan_api_key_senopati_disini
+   SENOPATI_API_KEY=ada lah 
 
    # Konfigurasi Ollama Lokal (jika digunakan)
    OLLAMA_URL=http://127.0.0.1:11434
