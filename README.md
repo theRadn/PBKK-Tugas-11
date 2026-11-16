@@ -23,8 +23,8 @@ Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, 
 
 | Bukti | Tangkapan Layar |
 | :--- | :--- |
-| **Respons di Interface dan API Chat JSON (HTTP 200)** | ![01 - Chat API 200](<img width="1854" height="1007" alt="image" src="https://github.com/user-attachments/assets/fc62a51b-ba05-4d37-884a-b05773eea913" />) |
-| **Metadata Model & Token Consumption** | ![02 - Metadata Model dan Token](<img width="591" height="268" alt="image" src="https://github.com/user-attachments/assets/66c08874-6e2b-447f-bdb0-d223da0e5612" />) |
+| **Respons di Interface dan API Chat JSON (HTTP 200)** | ![01 - Chat API 200](https://github.com/user-attachments/assets/fc62a51b-ba05-4d37-884a-b05773eea913) |
+| **Metadata Model & Token Consumption** | ![02 - Metadata Model dan Token](https://github.com/user-attachments/assets/66c08874-6e2b-447f-bdb0-d223da0e5612) |
 
 ---
 
@@ -33,10 +33,9 @@ Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, 
 
 | Bukti | Tangkapan Layar |
 | :--- | :--- |
-| **Rute API Terproteksi `auth:sanctum` (`route:list`)** | ![03 - Route List Sanctum](<img width="717" height="239" alt="image" src="https://github.com/user-attachments/assets/2c8b3af8-acd5-46f0-8ade-5da8a183a6f1" />) |
-| **Endpoint Login & Penerbitan Bearer Token** | ![04 - Login Token](<img width="717" height="290" alt="image" src="https://github.com/user-attachments/assets/2ed79734-aca6-4e48-b352-cd94c6d353ce" />) |
-| **Penolakan Akses Tanpa Token (HTTP 405)** | ![05 - Error 405 Tanpa Token](<img width="717" height="290" alt="image" src="https://github.com/user-attachments/assets/2c2a9515-1cee-4bae-964c-a192bbf83060" />) |
-
+| **Rute API Terproteksi `auth:sanctum` (`route:list`)** | ![03 - Route List Sanctum](https://github.com/user-attachments/assets/2c8b3af8-acd5-46f0-8ade-5da8a183a6f1) |
+| **Endpoint Login & Penerbitan Bearer Token** | ![04 - Login Token](https://github.com/user-attachments/assets/2ed79734-aca6-4e48-b352-cd94c6d353ce) |
+| **Penolakan Akses Tanpa Token (HTTP 405)** | ![05 - Error 405 Tanpa Token](https://github.com/user-attachments/assets/2c2a9515-1cee-4bae-964c-a192bbf83060) |
 ---
 
 ### 3. Database Architecture & Chat Logging (Bobot 20%)
@@ -44,9 +43,9 @@ Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, 
 
 | Bukti | Tangkapan Layar |
 | :--- | :--- |
-| **Skema Migrasi Tabel `chat_logs`** | ![06 - Skema Database](<img width="717" height="290" alt="image" src="https://github.com/user-attachments/assets/fd93460b-7a6d-4fba-964b-c22e8e363801" />) |
-| **Pencatatan Baris Database (`user_id`, `prompt`, `jawaban_ai`, `model`, `token`)** | ![07 - Log Database](<img width="717" height="290" alt="image" src="https://github.com/user-attachments/assets/a53642b0-6164-4e01-a3ef-576620877158" />) |
-| **Relasi Eloquent `User -> chatLogs` dan `ChatLog -> user`** | ![08 - Relasi Eloquent](<img width="717" height="290" alt="image" src="https://github.com/user-attachments/assets/7e2c17b5-5a1d-48bf-aaa4-51c734b7b05c" />) |
+| **Skema Migrasi Tabel `chat_logs`** | ![06 - Skema Database](https://github.com/user-attachments/assets/fd93460b-7a6d-4fba-964b-c22e8e363801) |
+| **Pencatatan Baris Database (`user_id`, `prompt`, `jawaban_ai`, `model`, `token`)** | ![07 - Log Database](https://github.com/user-attachments/assets/a53642b0-7a1d-4e01-a3ef-576620877158) |
+| **Relasi Eloquent `User -> chatLogs` dan `ChatLog -> user`** | ![08 - Relasi Eloquent](https://github.com/user-attachments/assets/7e2c17b5-5a1d-48bf-aaa4-51c734b7b05c) |
 
 ---
 
@@ -55,9 +54,9 @@ Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, 
 
 | Bukti | Tangkapan Layar |
 | :--- | :--- |
-| **[Challenge 1] Streaming SSE (`text/event-stream`, event `delta` & `done`)** | ![09 - SSE Streaming](<img width="894" height="692" alt="image" src="https://github.com/user-attachments/assets/00e2f736-6ac4-42fc-a1a2-0eb2de04c745" />) |
-| **[Challenge 2] System Prompt Injection (Tema Asisten Ide Proyek PBKK)** | ![10 - System Prompt Injection](<img width="894" height="692" alt="image" src="https://github.com/user-attachments/assets/2401993f-17fd-4061-896e-99564ad31ba9" />) |
-| **[Challenge 3] Auto-fallback Otomatis Ollama ke Senopati ITS (`fallback_used: true`)** | ![11 - Auto Fallback](<img width="1292" height="833" alt="image" src="https://github.com/user-attachments/assets/d749909c-a3ea-41a9-ab76-eae0a46bd3f7" />) |
+| **[Challenge 1] Streaming SSE (`text/event-stream`, event `delta` & `done`)** | ![09 - SSE Streaming](https://github.com/user-attachments/assets/00e2f736-6ac4-42fc-a1a2-0eb2de04c745) |
+| **[Challenge 2] System Prompt Injection (Tema Asisten Ide Proyek PBKK)** | ![10 - System Prompt Injection](https://github.com/user-attachments/assets/2401993f-17fd-4061-896e-99564ad31ba9) |
+| **[Challenge 3] Auto-fallback Otomatis Ollama ke Senopati ITS (`fallback_used: true`)** | ![11 - Auto Fallback](https://github.com/user-attachments/assets/d749909c-a3ea-41a9-ab76-eae0a46bd3f7) |
 
 ---
 
@@ -66,7 +65,7 @@ Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, 
 
 | Bukti | Tangkapan Layar |
 | :--- | :--- |
-| **Manajemen Riwayat Percakapan per Sesi & Tombol Muat Ulang** | ![12 - Riwayat per Sesi](<img width="1308" height="739" alt="image" src="https://github.com/user-attachments/assets/cab9d5fd-3691-4821-9d37-91bd9acfe3eb" />) |
+| **Manajemen Riwayat Percakapan per Sesi & Tombol Muat Ulang** | ![12 - Riwayat per Sesi](https://github.com/user-attachments/assets/cab9d5fd-3691-4821-9d37-91bd9acfe3eb) |
 
 ---
 
