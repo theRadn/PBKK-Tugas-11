@@ -1,4 +1,4 @@
-# Secure LLM Chat API Hub — PBKK ITS
+[Screencast From 2026-11-16 10-51-13.webm](https://github.com/user-attachments/assets/69d5f7db-de68-4dd6-9f30-386fc861fbe3)# Secure LLM Chat API Hub — PBKK ITS
 
 Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, **Senopati AI ITS / Ollama**, dan **SQLite Relasional**. Memenuhi seluruh ketentuan tugas mata kuliah Pemrograman Berbasis Kerangka Kerja (PBKK) ITS.
 
@@ -44,7 +44,8 @@ Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, 
 | Bukti | Tangkapan Layar |
 | :--- | :--- |
 | **Skema Migrasi Tabel `chat_logs`** | ![06 - Skema Database](https://github.com/user-attachments/assets/fd93460b-7a6d-4fba-964b-c22e8e363801) |
-| **Pencatatan Baris Database (`user_id`, `prompt`, `jawaban_ai`, `model`, `token`)** | ![07 - Log Database](https://github.com/user-attachments/assets/a53642b0-7a1d-4e01-a3ef-576620877158) |
+| **Pencatatan Baris Database (`user_id`, `prompt`, `jawaban_ai`, `model`, `token`)** | <img width="717" height="290" alt="image" src="https://github.com/user-attachments/assets/ec22931c-f0e3-45b2-b8aa-cf850ba1753f" />
+ |
 | **Relasi Eloquent `User -> chatLogs` dan `ChatLog -> user`** | ![08 - Relasi Eloquent](https://github.com/user-attachments/assets/7e2c17b5-5a1d-48bf-aaa4-51c734b7b05c) |
 
 ---
@@ -54,7 +55,7 @@ Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, 
 
 | Bukti | Tangkapan Layar |
 | :--- | :--- |
-| **[Challenge 1] Streaming SSE (`text/event-stream`, event `delta` & `done`)** | ![09 - SSE Streaming](https://github.com/user-attachments/assets/00e2f736-6ac4-42fc-a1a2-0eb2de04c745) |
+| **[Challenge 1] Streaming SSE (`text/event-stream`, event `delta` & `done`)** | [Screencast From 2026-11-16 10-51-13.webm](https://github.com/user-attachments/assets/8f13ba10-af8a-4baf-b524-cc4b1518a393) |
 | **[Challenge 2] System Prompt Injection (Tema Asisten Ide Proyek PBKK)** | ![10 - System Prompt Injection](https://github.com/user-attachments/assets/2401993f-17fd-4061-896e-99564ad31ba9) |
 | **[Challenge 3] Auto-fallback Otomatis Ollama ke Senopati ITS (`fallback_used: true`)** | ![11 - Auto Fallback](https://github.com/user-attachments/assets/d749909c-a3ea-41a9-ab76-eae0a46bd3f7) |
 
