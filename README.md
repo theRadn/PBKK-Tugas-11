@@ -1,3 +1,5 @@
+# Secure LLM Chat API Hub — PBKK ITS
+
 Aplikasi web dan API hub LLM aman berbasis **Laravel 11**, **Laravel Sanctum**, **Senopati AI ITS / Ollama**, dan **SQLite Relasional**. Memenuhi seluruh ketentuan tugas mata kuliah Pemrograman Berbasis Kerangka Kerja (PBKK) ITS.
 
 ---
